@@ -4,4 +4,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 include(CMakeSources.cmake)
 
-add_executable(abalone_game ${SRC_FILES})
+include_directories(include)
+
+add_executable(abalone_game ${SRC_FILES} abalone.cpp)

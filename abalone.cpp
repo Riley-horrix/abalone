@@ -7,20 +7,20 @@
  * 
  * Copyright (c) Riley Horrix 2025
  */
-#include <iostream>
+#include <memory>
 
 #include "common/utils.hpp"
 #include "game/board.hpp"
+#include "graphics/textRenderer.hpp"
 #include "abalone.hpp"
 
 
 int main(void) {
-    std::cout << "Hello, abalone " << std::endl;
-    Abalone::Abalone();
+    std::shared_ptr<Abalone::AbaloneBoard> board = std::make_shared<Abalone::AbaloneBoard>(Abalone::GameOpening::BELGIAN_DAISY);
 
-    Abalone::AbaloneBoard board(Abalone::GameOpening::BELGIAN_DAISY);
+    Abalone::TextRenderer renderer(board);
 
-    board.show();
+    renderer.draw();
 
     return 0;
 }

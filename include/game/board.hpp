@@ -9,6 +9,9 @@
  */
 #pragma once
 #include <cstdint>
+#include <vector>
+
+#include "game/position.hpp"
 
 namespace Abalone {
 
@@ -16,6 +19,16 @@ enum class GameOpening {
     BELGIAN_DAISY,
     GERMAN_DAISY
 };
+
+/**
+ * @brief Enum representing the individual player.
+ */
+enum class Player {
+    NONE = 0,
+    BLACK = 1,
+    WHITE = 2
+};
+
 
 /**
  * @brief Class for managing a single abalone board instance.
@@ -48,11 +61,10 @@ public:
     AbaloneBoard(GameOpening opening);
 
     /**
-     * @brief Construct a new Abalone Board object using a custom setup.
+     * @brief Construct a new Abalone Board object using a list of positions for the white and black pieces.
      * 
-     * @param opening 
      */
-    AbaloneBoard(uint64_t whiteOpening, uint64_t blackOpening);
+    AbaloneBoard(const std::vector<Position>& whitePositions, const std::vector<Position>& blackPositions);
 
     /**
      * @brief Destroy the Abalone Board object.
@@ -65,15 +77,6 @@ public:
     void show(void);
 
     /**
-     * @brief Enum representing the individual player.
-     */
-    enum class Player {
-        NONE = 0,
-        BLACK = 1,
-        WHITE = 2
-    };
-
-    /**
      * @brief Get the value of the position at the given horizontal row (A-I),
      * and given diagonal row (1-9).
      * 
@@ -82,6 +85,14 @@ public:
      * @return Player The player at that position, or None.
      */
     Player operator()(char horizontal, char diagonal);
+
+    /**
+     * @brief Get the value of the position at the given position.
+     * 
+     * @param position The position.
+     * @return Player The player at that position, or None.
+     */
+    Player operator()(const Position& position);
 
 private:
     //! @brief Bit field containing the positions of the white pieces.
@@ -95,6 +106,37 @@ private:
 
     //! @brief Number of black pieces off the board.
     int blackOff = 0;
+
+    //! @brief Index offset lookup for horizontal positions.
+    static int hLookUp[9];
+
+    //! @brief Diagonal offset lookup for horizontal positions.
+    static int dOffset[9];
+
+    /**
+     * @brief Translate a board position to an index as described in the board description.
+     * 
+     * @param position A board position.
+     * @return int The index, or -1 if the position is invalid.
+     */
+    int positionToIndex(const Position& position);
+
+    /**
+     * @brief Translate an index to a board position.
+     * 
+     * @param index Index in the range [0, 60].
+     * @return Position The position, this will be invalid if the index is 
+     * out of range.
+     */
+    Position indexToPosition(const int index);
+
+    /**
+     * @brief Get the Player at the given index.
+     * 
+     * @param index The index into the bitfield.
+     * @return Player The player, or None, at that position.
+     */
+    Player pieceAt(int index);
 };
 
 }

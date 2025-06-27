@@ -15,6 +15,14 @@
 
 using namespace Abalone;
 
+int AbaloneBoard::hLookUp[9] = {
+    0, 5, 11, 18, 26, 35, 43, 50, 56
+};
+
+int AbaloneBoard::dOffset[9] = {
+    0, 0, 0, 0, 0, -1, -2, -3, -4
+};
+
 AbaloneBoard::AbaloneBoard(GameOpening opening) {
     // Initialise pieces depending on the chosen game opening.
     switch (opening) {
@@ -35,10 +43,10 @@ AbaloneBoard::AbaloneBoard(GameOpening opening) {
     }
 }
 
-AbaloneBoard::AbaloneBoard(uint64_t whiteOpening, uint64_t blackOpening) {
-    // Verify that both openings have 14 marbles.
+// AbaloneBoard::AbaloneBoard(uint64_t whiteOpening, uint64_t blackOpening) {
+//     // Verify that both openings have 14 marbles.
 
-}
+// }
 
 AbaloneBoard::~AbaloneBoard() {}
 
@@ -77,28 +85,41 @@ void AbaloneBoard::show() {
     printf("Black: 0\n\n");
 }
 
-AbaloneBoard::Player AbaloneBoard::operator()(char horizontal, char diagonal) {
+Player AbaloneBoard::operator()(char horizontal, char diagonal) {
     // Validate numbers
-    int hInd = std::tolower(horizontal) - 'a';
-    int vInd = std::tolower(diagonal) - '1';
+    return this->operator()(Position(horizontal, diagonal));
+}
 
-#ifdef DEBUG
-    if (hInd < 0 || hInd > 9 || vInd < 0 || vInd > 9) {
-        warn("Bad index into the board! Index : (%c, %c), should be ([A,I], [1,9])", horizontal, diagonal);
-        return Player::NONE;
+Player AbaloneBoard::operator()(const Position& position) {
+    return pieceAt(positionToIndex(position));
+}
+
+int AbaloneBoard::positionToIndex(const Position& position) {
+    if (!position.isValid()) {
+        return -1;
     }
-#endif
 
-    static int hLookUp[9] = {
-        0, 5, 11, 18, 26, 35, 43, 50, 56
-    };
+    int index = hLookUp[position.getHorizontalIndex()] + dOffset[position.getHorizontalIndex()] + position.getDiagonalIndex();
 
-    static int dOffset[9] = {
-        0, 0, 0, 0, 0, -1, -2, -3, -4
-    };
+    return index;
+}
 
-    int index = hLookUp[hInd] + dOffset[hInd] + vInd;
+Position AbaloneBoard::indexToPosition(const int index) {
+    if (index < 0 || index > 60) {
+        return Position::invalid();
+    }
 
+    // Iterate through lookup
+    int hIndex = 0;
+
+    while (hLookUp[hIndex++] < index) {}
+
+    hIndex--;
+
+    return Position('a' + hIndex, '1' - dOffset[hIndex] + index - hLookUp[index]);
+}
+
+Player AbaloneBoard::pieceAt(int index) {
     return blackPieces & Utils::bit<uint64_t>(index) ? Player::BLACK : 
         (whitePieces & Utils::bit<uint64_t>(index) ? Player::WHITE : Player::NONE);
 }

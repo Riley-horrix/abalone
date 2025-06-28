@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include <variant>
+
 #include "game/position.hpp"
 
 namespace Abalone {
@@ -18,26 +20,7 @@ enum class MoveType {
     BROADSIDE
 };
 
-class Move {
-public:
-    /**
-     * @brief Get the type of move.
-     * 
-     * @return MoveType The type of move.
-     */
-    MoveType type(void);
-
-protected:
-    /**
-     * @brief Protected constructor for a move object.
-     */
-    Move(MoveType type);
-
-    //! @brief The type of move.
-    MoveType moveType;
-};
-
-class BroadsideMove : public Move {
+class BroadsideMove {
 public:
     /**
      * @brief Construct a new Broadside Move.
@@ -48,7 +31,6 @@ public:
      */
     BroadsideMove(const Position& first, const Position& last, const Position& firstEnd);
 
-private:
     //! @brief The position of the first ball in the broadside to move.
     const Position first;
 
@@ -59,7 +41,7 @@ private:
     const Position firstEnd;
 };
 
-class InlineMove : public Move {
+class InlineMove {
 public:
     /**
      * @brief Construct a new Inline Move.
@@ -69,12 +51,29 @@ public:
      */
     InlineMove(const Position& start, const Position& end);
 
-private:
     //! @brief The starting position of the last ball of the inline move.
     const Position start;
 
     //! @brief The finishing position of the last ball of the inline move.
     const Position end;
+};
+
+class Move {
+public:
+    Move(BroadsideMove move);
+    Move(InlineMove move);
+
+    /**
+     * @brief Get the type of move.
+     * 
+     * @return MoveType The type of move.
+     */
+    MoveType type(void) const;
+
+    const std::variant<BroadsideMove, InlineMove>& getMove(void) const;
+
+private:
+    std::variant<BroadsideMove, InlineMove> var;
 };
 
 }

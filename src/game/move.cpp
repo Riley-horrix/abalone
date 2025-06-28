@@ -13,14 +13,22 @@ using namespace Abalone;
 
 // --- Move ---
 
-Move::Move(MoveType type): moveType(type) {}
+Move::Move(BroadsideMove move): var(move) {}
 
-MoveType Move::type(void) { return moveType; }
+Move::Move(InlineMove move): var(move) {}
+
+MoveType Move::type(void) const {
+    return std::holds_alternative<InlineMove>(var) ? MoveType::INLINE : MoveType::BROADSIDE;
+}
+
+const std::variant<BroadsideMove, InlineMove>& Move::getMove(void) const {
+    return var;
+}
 
 // --- BroadsideMove ---
 
-BroadsideMove::BroadsideMove(const Position& first, const Position& last, const Position& firstEnd): Move(MoveType::BROADSIDE), first(first), last(last), firstEnd(firstEnd) {}
+BroadsideMove::BroadsideMove(const Position& first, const Position& last, const Position& firstEnd): first(first), last(last), firstEnd(firstEnd) {}
 
 // --- InlineMove ---
 
-InlineMove::InlineMove(const Position& start, const Position& end): Move(MoveType::INLINE), start(start), end(end) {}
+InlineMove::InlineMove(const Position& start, const Position& end): start(start), end(end) {}

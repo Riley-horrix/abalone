@@ -15,11 +15,11 @@
 
 #include "common/utils.hpp"
 
-#define error(fmt, ...) (fprintf(stderr, "\e[31m[%llu ERROR]\e[0m " fmt "!\n", Utils::micros() , ##__VA_ARGS__ ), fflush(stderr), raise(SIGTERM))
-#define warn(fmt, ...) fprintf(stdout, "\e[93m[%llu WARN]\e[0m " fmt "!\n", Utils::micros() , ##__VA_ARGS__ )
-#define info(fmt, ...) fprintf(stdout, "\e[32m[%llu info]\e[0m " fmt ".\n", Utils::micros() , ##__VA_ARGS__ )
+#define error(fmt, ...) (fprintf(stderr, "\e[31m[ERROR]\e[0m " fmt "!\n" , ##__VA_ARGS__ ), fflush(stderr), raise(SIGTERM))
+#define warn(fmt, ...) fprintf(stdout, "\e[93m[WARN]\e[0m " fmt "!\n" , ##__VA_ARGS__ )
+#define info(fmt, ...) fprintf(stdout, "\e[32m[info]\e[0m " fmt ".\n" , ##__VA_ARGS__ )
 #define prompt(fmt, ...) fprintf(stdout, "\e[96m" fmt "\e[0m" , ##__VA_ARGS__)
 
 #ifdef DEBUG
-#define debug(fmt, ...) fprintf(stdout, "\e[31m[%llu WARN]\e[0m " fmt "!\n", Utils::micros() , ##__VA_ARGS__ )
+#define debug(fmt, ...) fprintf(stdout, "\e[31m[WARN]\e[0m " fmt "!\n" , ##__VA_ARGS__ )
 #endif

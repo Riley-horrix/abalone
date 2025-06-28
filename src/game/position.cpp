@@ -15,24 +15,21 @@
 using namespace Abalone;
 
 Position::Position(char h, char d): horizontal(std::tolower(h)), diagonal(d) {
-    hInd = horizontal - 'a';
-    dInd = diagonal - '1';
+    horizontalIndex = horizontal - 'a';
+    diagonalIndex = diagonal - '1';
 
     // Validate position
     if (horizontal < 'a' || horizontal > 'i' || diagonal < '1' || diagonal > '9') {
-        warn("Bad board position! Index : (%c, %c), should be ([A,I], [1,9])", h, d);
         valid = false;
         return;
     }
 
     if (horizontal <= 'e' && diagonal > ('5' + horizontal - 'a')) {
-        warn("Bad board position! Index : (%c, %c), should be ([A,I], [1,9])", h, d);
         valid = false;
         return;
     }
 
     if (horizontal > 'e' && diagonal < '2' + horizontal - 'f') {
-        warn("Bad board position! Index : (%c, %c), should be ([A,I], [1,9])", h, d);
         valid = false;
         return;
     }

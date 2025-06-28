@@ -22,21 +22,12 @@ public:
      */
     Position(char horizontal, char diagonal);
 
+    /**
+     * @brief Initialiser for a blank invalid position.
+     * 
+     * @return Position An invalid position.
+     */
     static Position invalid(void);
-
-    /**
-     * @brief Get the Horizontal position.
-     * 
-     * @return char The position character.
-     */
-    inline char getHorizontal(void) const { return horizontal; }
-
-    /**
-     * @brief Get the Diagonal position.
-     * 
-     * @return char The position character.
-     */
-    inline char getDiagonal(void) const { return diagonal; }
 
     /**
      * @brief Get whether the position is a valid board position or not.
@@ -46,31 +37,20 @@ public:
      */
     inline bool isValid(void) const { return valid; }
 
-    /**
-     * @brief Get the horizontal index of the position.
-     * 
-     * On this scale, 'a' is 0, and 'i' is 8.
-     * 
-     * @return int The horizontal index.
-     */
-    inline int getHorizontalIndex(void) const { return hInd; }
-
-    /**
-     * @brief Get the diagonal index of the position.
-     * 
-     * On this scale, '1' is 0, and '9' is 8.
-     * 
-     * @return int The diagonal index.
-     */
-    inline int getDiagonalIndex(void) const { return dInd; }
-
-private:
+    //! @brief Horizontal position.
     char horizontal;
+
+    //! @brief Diagonal position.
     char diagonal;
 
-    int hInd;
-    int dInd;
+    //! @brief Horizontal position index.
+    int horizontalIndex;
 
+    //! @brief Diagonal position index.
+    int diagonalIndex;
+
+private:
+    //! @brief If the position is valid or not.
     bool valid;
 };
 

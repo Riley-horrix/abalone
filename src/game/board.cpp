@@ -15,6 +15,16 @@
 
 using namespace Abalone;
 
+Player Abalone::otherPlayer(const Player& player) {
+    if (player == Player::BLACK) {
+        return Player::WHITE;
+    } else if (player == Player::WHITE) {
+        return Player::BLACK;
+    }
+
+    return Player::NONE;
+}
+
 int AbaloneBoard::hLookUp[9] = {
     0, 5, 11, 18, 26, 35, 43, 50, 56
 };
@@ -50,47 +60,34 @@ AbaloneBoard::AbaloneBoard(GameOpening opening) {
 
 AbaloneBoard::~AbaloneBoard() {}
 
-void AbaloneBoard::show() {
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < std::abs(4 - i); j++) {
-            printf(" ");
-        }
+bool AbaloneBoard::moveValid(const Move& move, const Player& player) {
+    if (move.type() == MoveType::BROADSIDE) {
+        return broadsideMoveValid(std::get<BroadsideMove>(move.getMove()), player);
+    } else {
+        return inlineMoveValid(std::get<InlineMove>(move.getMove()), player);
+    }
+}
 
-        printf("%c ", 'I' - i);
-
-        for (int j = 0; j < (9 - std::abs(i - 4)); j++) {
-            Player player = this->operator()('I' - i, '1' + (i > 3 ? 0 : 4 - i) + j);
-            switch (player) {
-                case Player::WHITE:
-                    printf("@ ");
-                    break;
-                case Player::BLACK:
-                    printf("0 ");
-                    break;
-                case Player::NONE:
-                    printf("+ ");
-                    break;
-            }
-        }
-
-        if (i >= 5) {
-            printf("%c", '9' - (i - 5));
-        }
-
-        printf("\n");
+bool AbaloneBoard::move(const Move& move, const Player& player) {
+    if (!moveValid(move, player)) {
+        return false;
     }
 
-    printf("       1 2 3 4 5\n\n");
-    printf("White: @\n");
-    printf("Black: 0\n\n");
+    if (move.type() == MoveType::BROADSIDE) {
+        broadsideMove(std::get<BroadsideMove>(move.getMove()), player);
+    } else {
+        inlineMove(std::get<InlineMove>(move.getMove()), player);
+    }
+
+    return true;
 }
 
-Player AbaloneBoard::operator()(char horizontal, char diagonal) {
+Player AbaloneBoard::pieceAt(char horizontal, char diagonal) {
     // Validate numbers
-    return this->operator()(Position(horizontal, diagonal));
+    return this->pieceAt(Position(horizontal, diagonal));
 }
 
-Player AbaloneBoard::operator()(const Position& position) {
+Player AbaloneBoard::pieceAt(const Position& position) {
     return pieceAt(positionToIndex(position));
 }
 
@@ -99,7 +96,7 @@ int AbaloneBoard::positionToIndex(const Position& position) {
         return -1;
     }
 
-    int index = hLookUp[position.getHorizontalIndex()] + dOffset[position.getHorizontalIndex()] + position.getDiagonalIndex();
+    int index = hLookUp[position.horizontalIndex] + dOffset[position.horizontalIndex] + position.diagonalIndex;
 
     return index;
 }
@@ -122,4 +119,187 @@ Position AbaloneBoard::indexToPosition(const int index) {
 Player AbaloneBoard::pieceAt(int index) {
     return blackPieces & Utils::bit<uint64_t>(index) ? Player::BLACK : 
         (whitePieces & Utils::bit<uint64_t>(index) ? Player::WHITE : Player::NONE);
+}
+
+void AbaloneBoard::setPieceAt(const Position& position, const Player& player) {
+    uint64_t mask = Utils::bit<uint64_t>(positionToIndex(position));
+
+    if (player == Player::NONE) {
+        whitePieces &= ~mask;
+        blackPieces &= ~mask;
+    } else if (player == Player::WHITE) {
+        whitePieces |= mask;
+        blackPieces &= ~mask;
+    } else {
+        blackPieces |= mask;
+        whitePieces &= ~mask;
+    }
+}
+
+int AbaloneBoard::distance(const Position& start, const Position& end) {
+    return std::max(std::abs(start.diagonalIndex - end.diagonalIndex), std::abs(start.horizontalIndex - end.horizontalIndex));
+}
+
+
+bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player) {
+    // Validate moves and player
+    if (!move.end.isValid() || !move.start.isValid() || player == Player::NONE) {
+        return false;
+    }
+
+    // Ensure starting position is correct player
+    if (pieceAt(move.start) != player) {
+        return false;
+    }
+
+    // Ensure finishing position is 1 space from the starting move
+    if (distance(move.start, move.end) > 1) {
+        return false;
+    }
+
+    // Get the direction of the move
+    int horizontalDir = move.end.horizontalIndex - move.start.horizontalIndex;
+    int diagonalDir = move.end.diagonalIndex - move.start.diagonalIndex;
+
+    // Get every piece from the start to the end of the board in the direction
+    // of the move.
+    Player spaces[9] = { Player::NONE };
+
+    int i = 0;
+    Position currentPos = move.start;
+
+    while (currentPos.isValid() && i < 9) {
+        spaces[i++] = pieceAt(currentPos);
+        currentPos = Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir);
+    }
+
+    // Now we want to analyse the spaces array.
+    int playerPieces = 0;
+    int otherPieces = 0;
+
+    while (spaces[playerPieces++] == player) {}
+
+    playerPieces--;
+
+    // Should be 3 or less, and not at the end of the board
+    if (playerPieces > 3 || playerPieces == i) {
+        return false;
+    }
+
+    // Now there should be either 1 blank space, or < playerPieces 
+    // enemy pieces.
+
+    if (spaces[playerPieces] == Player::NONE) {
+        return true;
+    }
+
+    // Count other player pieces
+    while (spaces[playerPieces + otherPieces++] == otherPlayer(player) && playerPieces + otherPieces < i) {}
+
+    otherPieces--;
+
+    if (playerPieces <= otherPieces) {
+        return false;
+    }
+
+    // Ensure there is either the end of the board or empty after
+    if (i > playerPieces + otherPieces && spaces[playerPieces + otherPieces] != Player::NONE) {
+        return false;
+    }
+
+    return true;
+}
+
+bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& player) {
+        // Validate moves and player
+    if (!move.last.isValid() || !move.first.isValid() || !move.firstEnd.isValid() || player == Player::NONE) {
+        return false;
+    }
+
+    // Ensure starting position is correct player
+    if (pieceAt(move.first) != player || pieceAt(move.firstEnd) != player) {
+        return false;
+    }
+
+    // Ensure broadside is only using 3 or less pieces
+    int pieces = distance(move.first, move.last) + 1;
+    if (pieces > 3) {
+        return false;
+    }
+
+    // Ensure move is only 1 space away from start
+    if (distance(move.first, move.firstEnd) > 1) {
+        return false;
+    }
+
+    // Get the direction of the move
+    int horizontalDir = move.firstEnd.horizontalIndex - move.first.horizontalIndex;
+    int diagonalDir = move.firstEnd.diagonalIndex - move.first.diagonalIndex;
+
+    // Ensure that the direction is not equal to the direction of the broadside.
+    // Get the direction of the broadside
+    int horizontalBroadside = move.last.horizontalIndex - move.first.horizontalIndex;
+    int diagonalBroadside = move.last.diagonalIndex - move.first.diagonalIndex;
+
+    // Ensure middle piece is also player
+    if (pieces == 3 && pieceAt(Position(move.first.horizontal + horizontalBroadside, move.first.diagonal + diagonalBroadside)) != player) {
+        return false;
+    }
+
+    if (std::abs(horizontalBroadside) == std::abs(horizontalDir) &&
+        std::abs(diagonalBroadside) == std::abs(diagonalDir)) {
+        return false;
+    }
+
+    // Now just ensure all of the moved to places are empty squares
+    Position currentPosition = move.firstEnd;
+    for (int i = 0; i < pieces; i++) {
+        if (!currentPosition.isValid() || pieceAt(currentPosition) != Player::NONE) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void AbaloneBoard::inlineMove(const InlineMove& move, const Player& player) {
+    // Get the direction of the move
+    int horizontalDir = move.end.horizontalIndex - move.start.horizontalIndex;
+    int diagonalDir = move.end.diagonalIndex - move.start.diagonalIndex;
+
+    // Now we just want to make the move
+    Player next = Player::NONE;
+    Position currentPos = move.start;
+
+    while (currentPos.isValid()) {
+        Player current = pieceAt(currentPos);
+
+        setPieceAt(currentPos, next);
+
+        next = current;
+        currentPos = Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir);
+
+        if (next == Player::NONE) {
+            break;
+        }
+    }
+}
+
+void AbaloneBoard::broadsideMove(const BroadsideMove& move, const Player& player) {
+    // Get the direction of the move
+    int horizontalDir = move.firstEnd.horizontalIndex - move.first.horizontalIndex;
+    int diagonalDir = move.firstEnd.diagonalIndex - move.first.diagonalIndex;
+
+    // Get the direction of the broadside
+    int horizontalBroadside = move.last.horizontalIndex - move.first.horizontalIndex;
+    int diagonalBroadside = move.last.diagonalIndex - move.first.diagonalIndex;
+
+    Position currentPos = move.first;
+
+    while (currentPos.diagonal != move.last.diagonal || currentPos.horizontal != move.last.horizontal) {
+        setPieceAt(currentPos, Player::NONE);
+        setPieceAt(Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir), player);
+
+        currentPos = Position(currentPos.horizontal + horizontalBroadside, currentPos.diagonal + diagonalBroadside);
+    }
 }

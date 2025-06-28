@@ -7,6 +7,7 @@
  * 
  * Copyright (c) Riley Horrix 2025
  */
+#include <iostream>
 #include <memory>
 
 #include "common/utils.hpp"
@@ -14,11 +15,24 @@
 #include "graphics/textRenderer.hpp"
 #include "abalone.hpp"
 
+using namespace Abalone;
 
 int main(void) {
-    std::shared_ptr<Abalone::AbaloneBoard> board = std::make_shared<Abalone::AbaloneBoard>(Abalone::GameOpening::BELGIAN_DAISY);
+    std::shared_ptr<AbaloneBoard> board = std::make_shared<AbaloneBoard>(GameOpening::BELGIAN_DAISY);
 
-    Abalone::TextRenderer renderer(board);
+    TextRenderer renderer(board);
+
+    renderer.draw();
+
+    bool mv = board->move(Move(InlineMove(Position('B', '1'), Position('C', '2'))), Player::BLACK);
+
+    std::cout << mv << "\n";
+
+    renderer.draw();
+
+    mv = board->move(Move(InlineMove(Position('B', '6'), Position('C', '6'))), Player::WHITE);
+
+    std::cout << mv << "\n";
 
     renderer.draw();
 

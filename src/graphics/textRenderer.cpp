@@ -7,6 +7,7 @@
  * 
  * Copyright (c) Riley Horrix 2025
  */
+#include "common/logging.hpp"
 #include "game/board.hpp"
 #include "graphics/textRenderer.hpp"
 
@@ -23,16 +24,16 @@ void TextRenderer::draw(void) {
         printf("%c ", 'I' - i);
 
         for (int j = 0; j < (9 - std::abs(i - 4)); j++) {
-            Player player = board->operator()('I' - i, '1' + (i > 3 ? 0 : 4 - i) + j);
+            Player player = board->pieceAt('I' - i, '1' + (i > 3 ? 0 : 4 - i) + j);
             switch (player) {
                 case Player::WHITE:
-                    printf("@ ");
+                    printf("%c ", white);
                     break;
                 case Player::BLACK:
-                    printf("0 ");
+                    printf("%c ", black);
                     break;
                 case Player::NONE:
-                    printf("+ ");
+                    printf("%c ", none);
                     break;
             }
         }
@@ -45,6 +46,6 @@ void TextRenderer::draw(void) {
     }
 
     printf("       1 2 3 4 5\n\n");
-    printf("White: @\n");
-    printf("Black: 0\n\n");
+    printf("White: %c\n", white);
+    printf("Black: %c\n\n", black);
 }

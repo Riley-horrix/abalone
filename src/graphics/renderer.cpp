@@ -12,3 +12,5 @@
 using namespace Abalone;
 
 Renderer::Renderer() {}
+
+Renderer::~Renderer() {}

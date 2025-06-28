@@ -25,6 +25,8 @@ Player Abalone::otherPlayer(const Player& player) {
     return Player::NONE;
 }
 
+constexpr int AbaloneBoard::STARTING_PIECES;
+
 int AbaloneBoard::hLookUp[9] = {
     0, 5, 11, 18, 26, 35, 43, 50, 56
 };
@@ -140,6 +142,16 @@ int AbaloneBoard::distance(const Position& start, const Position& end) {
     return std::max(std::abs(start.diagonalIndex - end.diagonalIndex), std::abs(start.horizontalIndex - end.horizontalIndex));
 }
 
+
+Player Abalone::AbaloneBoard::gameOver(void) {
+    if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
+        return Player::WHITE;
+    } else if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
+        return Player::BLACK;
+    }
+
+    return Player::NONE;
+}
 
 bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player) {
     // Validate moves and player

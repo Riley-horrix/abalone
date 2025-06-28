@@ -22,4 +22,6 @@
 
 #ifdef DEBUG
 #define debug(fmt, ...) fprintf(stdout, "\e[31m[WARN]\e[0m " fmt "!\n" , ##__VA_ARGS__ )
+#else
+#define debug(fmt, ...)
 #endif

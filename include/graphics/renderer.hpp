@@ -17,6 +17,8 @@ public:
      * @brief Execute a draw call.
      */
     virtual void draw(void) = 0;
+
+    virtual ~Renderer();
     
 protected:
     Renderer();

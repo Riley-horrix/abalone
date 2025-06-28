@@ -127,12 +127,21 @@ public:
      */
     int distance(const Position& start, const Position& end);
 
+    /**
+     * @brief Determines whether the game is over yet.
+     * 
+     * @return Player None if game is ongoing, or the winner.
+     */
+    Player gameOver(void);
+
 private:
     //! @brief Bit field containing the positions of the white pieces.
     uint64_t whitePieces = 0;
 
     //! @brief Bit field containing the positions of the black pieces.
     uint64_t blackPieces = 0;
+
+    static constexpr int STARTING_PIECES = 14;
 
     //! @brief Index offset lookup for horizontal positions.
     static int hLookUp[9];

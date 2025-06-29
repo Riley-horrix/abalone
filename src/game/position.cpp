@@ -14,7 +14,7 @@
 
 using namespace Abalone;
 
-Position::Position(char h, char d): horizontal(std::tolower(h)), diagonal(d) {
+Position::Position(char h, char d): horizontal(static_cast<char>(std::tolower(h))), diagonal(d) {
     horizontalIndex = horizontal - 'a';
     diagonalIndex = diagonal - '1';
 

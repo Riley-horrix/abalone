@@ -15,13 +15,13 @@
 
 #include "common/utils.hpp"
 
-#define error(fmt, ...) (fprintf(stderr, "\e[31m[ERROR]\e[0m " fmt "!\n" , ##__VA_ARGS__ ), fflush(stderr), raise(SIGTERM))
-#define warn(fmt, ...) fprintf(stdout, "\e[93m[WARN]\e[0m " fmt "!\n" , ##__VA_ARGS__ )
-#define info(fmt, ...) fprintf(stdout, "\e[32m[info]\e[0m " fmt ".\n" , ##__VA_ARGS__ )
-#define prompt(fmt, ...) fprintf(stdout, "\e[96m" fmt "\e[0m" , ##__VA_ARGS__)
+#define error(fmt, ...) (fprintf(stderr, "\033[31m[ERROR]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ ), fflush(stderr), raise(SIGTERM))
+#define warn(fmt, ...) fprintf(stdout, "\033[93m[WARN]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ )
+#define info(fmt, ...) fprintf(stdout, "\033[32m[info]\033[0m " fmt ".\n" __VA_OPT__(,) __VA_ARGS__ )
+#define prompt(fmt, ...) fprintf(stdout, "\033[96m" fmt "\033[0m" __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef DEBUG
-#define debug(fmt, ...) fprintf(stdout, "\e[31m[WARN]\e[0m " fmt "!\n" , ##__VA_ARGS__ )
+#define debug(fmt, ...) fprintf(stdout, "\033[95m[debug]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ )
 #else
 #define debug(fmt, ...)
 #endif

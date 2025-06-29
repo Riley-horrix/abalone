@@ -24,7 +24,7 @@ void TextRenderer::draw(void) {
         printf("%c ", 'I' - i);
 
         for (int j = 0; j < (9 - std::abs(i - 4)); j++) {
-            Player player = board->pieceAt('I' - i, '1' + (i > 3 ? 0 : 4 - i) + j);
+            Player player = board->pieceAt('I' - static_cast<char>(i), '1' + static_cast<char>((i > 3 ? 0 : 4 - i) + j));
             switch (player) {
                 case Player::WHITE:
                     printf("%c ", white);

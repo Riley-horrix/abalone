@@ -49,6 +49,9 @@ public:
      */
     template<class T>
     static inline T bit(int n) { return static_cast<T>(0x1) << n; }
+
+    template<class T>
+    static inline int sign(T val) { return val > 0 ? 1 : val < 0 ? -1 : 0; }
 };
 
 }

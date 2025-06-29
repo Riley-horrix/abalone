@@ -115,7 +115,7 @@ Position AbaloneBoard::indexToPosition(const int index) {
 
     hIndex--;
 
-    return Position('a' + hIndex, '1' - dOffset[hIndex] + index - hLookUp[index]);
+    return Position('a' + static_cast<char>(hIndex), '1' - static_cast<char>(dOffset[hIndex] + index - hLookUp[index]));
 }
 
 Player AbaloneBoard::pieceAt(int index) {
@@ -156,16 +156,19 @@ Player Abalone::AbaloneBoard::gameOver(void) {
 bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player) {
     // Validate moves and player
     if (!move.end.isValid() || !move.start.isValid() || player == Player::NONE) {
+        debug("inlineMoveValid(): A position was invalid or player == NONE");
         return false;
     }
 
     // Ensure starting position is correct player
     if (pieceAt(move.start) != player) {
+        debug("inlineMoveValid(): Starting piece not players");
         return false;
     }
 
     // Ensure finishing position is 1 space from the starting move
     if (distance(move.start, move.end) > 1) {
+        debug("Move distance not 1");
         return false;
     }
 
@@ -182,7 +185,7 @@ bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player)
 
     while (currentPos.isValid() && i < 9) {
         spaces[i++] = pieceAt(currentPos);
-        currentPos = Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir);
+        currentPos = Position(currentPos.horizontal + static_cast<char>(horizontalDir), currentPos.diagonal + static_cast<char>(diagonalDir));
     }
 
     // Now we want to analyse the spaces array.
@@ -195,6 +198,7 @@ bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player)
 
     // Should be 3 or less, and not at the end of the board
     if (playerPieces > 3 || playerPieces == i) {
+        debug("inlineMoveValid(): Selected more than 3 pieces or trying to push own piece off board");
         return false;
     }
 
@@ -211,11 +215,13 @@ bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player)
     otherPieces--;
 
     if (playerPieces <= otherPieces) {
+        debug("inlineMoveValid(): Trying to push the same or more pieces");
         return false;
     }
 
     // Ensure there is either the end of the board or empty after
     if (i > playerPieces + otherPieces && spaces[playerPieces + otherPieces] != Player::NONE) {
+        debug("inlineMoveValid(): Trying to push into your own piece");
         return false;
     }
 
@@ -225,22 +231,26 @@ bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player)
 bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& player) {
         // Validate moves and player
     if (!move.last.isValid() || !move.first.isValid() || !move.firstEnd.isValid() || player == Player::NONE) {
+        debug("broadsideMoveValid(): A move position or player is invalid");
         return false;
     }
 
     // Ensure starting position is correct player
-    if (pieceAt(move.first) != player || pieceAt(move.firstEnd) != player) {
+    if (pieceAt(move.first) != player || pieceAt(move.last) != player) {
+        debug("broadsideMoveValid(): First or last piece is not owned by player");
         return false;
     }
 
     // Ensure broadside is only using 3 or less pieces
     int pieces = distance(move.first, move.last) + 1;
     if (pieces > 3) {
+        debug("broadsideMoveValid(): Trying to broadside with more than 3 pieces.");
         return false;
     }
 
     // Ensure move is only 1 space away from start
     if (distance(move.first, move.firstEnd) > 1) {
+        debug("broadsideMoveValid(): Move end is too far away from start.");
         return false;
     }
 
@@ -250,16 +260,18 @@ bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& p
 
     // Ensure that the direction is not equal to the direction of the broadside.
     // Get the direction of the broadside
-    int horizontalBroadside = move.last.horizontalIndex - move.first.horizontalIndex;
-    int diagonalBroadside = move.last.diagonalIndex - move.first.diagonalIndex;
+    int horizontalBroadside = Utils::sign(move.last.horizontalIndex - move.first.horizontalIndex);
+    int diagonalBroadside = Utils::sign(move.last.diagonalIndex - move.first.diagonalIndex);
 
     // Ensure middle piece is also player
-    if (pieces == 3 && pieceAt(Position(move.first.horizontal + horizontalBroadside, move.first.diagonal + diagonalBroadside)) != player) {
+    if (pieces == 3 && pieceAt(Position(move.first.horizontal + static_cast<char>(horizontalBroadside), move.first.diagonal + static_cast<char>(diagonalBroadside))) != player) {
+        debug("broadsideMoveValid(): Piece in the middle of the broadside is not players.");
         return false;
     }
 
     if (std::abs(horizontalBroadside) == std::abs(horizontalDir) &&
         std::abs(diagonalBroadside) == std::abs(diagonalDir)) {
+        debug("broadsideMoveValid(): Attempting to broadside in same direction of move");
         return false;
     }
 
@@ -267,6 +279,7 @@ bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& p
     Position currentPosition = move.firstEnd;
     for (int i = 0; i < pieces; i++) {
         if (!currentPosition.isValid() || pieceAt(currentPosition) != Player::NONE) {
+            debug("broadsideMoveValid(): Moving into an invalid position or another player");
             return false;
         }
     }
@@ -275,6 +288,8 @@ bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& p
 }
 
 void AbaloneBoard::inlineMove(const InlineMove& move, const Player& player) {
+    (void) player;
+
     // Get the direction of the move
     int horizontalDir = move.end.horizontalIndex - move.start.horizontalIndex;
     int diagonalDir = move.end.diagonalIndex - move.start.diagonalIndex;
@@ -289,7 +304,7 @@ void AbaloneBoard::inlineMove(const InlineMove& move, const Player& player) {
         setPieceAt(currentPos, next);
 
         next = current;
-        currentPos = Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir);
+        currentPos = Position(currentPos.horizontal + static_cast<char>(horizontalDir), currentPos.diagonal + static_cast<char>(diagonalDir));
 
         if (next == Player::NONE) {
             break;
@@ -303,15 +318,16 @@ void AbaloneBoard::broadsideMove(const BroadsideMove& move, const Player& player
     int diagonalDir = move.firstEnd.diagonalIndex - move.first.diagonalIndex;
 
     // Get the direction of the broadside
-    int horizontalBroadside = move.last.horizontalIndex - move.first.horizontalIndex;
-    int diagonalBroadside = move.last.diagonalIndex - move.first.diagonalIndex;
+    int horizontalBroadside = Utils::sign(move.last.horizontalIndex - move.first.horizontalIndex);
+    int diagonalBroadside = Utils::sign(move.last.diagonalIndex - move.first.diagonalIndex);
 
     Position currentPos = move.first;
 
-    while (currentPos.diagonal != move.last.diagonal || currentPos.horizontal != move.last.horizontal) {
+    while (currentPos.diagonal != move.last.diagonal + diagonalBroadside || currentPos.horizontal != move.last.horizontal + horizontalBroadside) {
+        debug("setting broadside");
         setPieceAt(currentPos, Player::NONE);
-        setPieceAt(Position(currentPos.horizontal + horizontalDir, currentPos.diagonal + diagonalDir), player);
+        setPieceAt(Position(currentPos.horizontal + static_cast<char>(horizontalDir), currentPos.diagonal + static_cast<char>(diagonalDir)), player);
 
-        currentPos = Position(currentPos.horizontal + horizontalBroadside, currentPos.diagonal + diagonalBroadside);
+        currentPos = Position(currentPos.horizontal + static_cast<char>(horizontalBroadside), currentPos.diagonal + static_cast<char>(diagonalBroadside));
     }
 }

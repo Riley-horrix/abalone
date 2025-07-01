@@ -24,14 +24,14 @@ public:
      * 
      * @param board The game board.
      */
-    TextRenderer(std::shared_ptr<AbaloneBoard> board);
+    TextRenderer(std::shared_ptr<Board> board);
 
     //! @copydoc Renderer::draw().
     void draw(void) override;
 
 private:
     //! @brief Pointer to the board instance this renderer is rendering.
-    std::shared_ptr<AbaloneBoard> board = nullptr;
+    std::shared_ptr<Board> board = nullptr;
 
     //! @brief Character representing white pieces.
     const char white = 'W';

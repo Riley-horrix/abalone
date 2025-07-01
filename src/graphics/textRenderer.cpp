@@ -13,7 +13,7 @@
 
 using namespace Abalone;
 
-TextRenderer::TextRenderer(std::shared_ptr<AbaloneBoard> board): board(board) {}
+TextRenderer::TextRenderer(std::shared_ptr<Board> board): board(board) {}
 
 void TextRenderer::draw(void) {
     for (int i = 0; i < 9; i++) {

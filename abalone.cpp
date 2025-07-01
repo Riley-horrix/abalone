@@ -21,7 +21,7 @@
 using namespace Abalone;
 
 int main(void) {
-    std::shared_ptr<AbaloneBoard> board = std::make_shared<AbaloneBoard>(GameOpening::BELGIAN_DAISY);
+    std::shared_ptr<Board> board = std::make_shared<Board>(GameOpening::BELGIAN_DAISY);
     std::unique_ptr<Renderer> renderer = std::make_unique<TextRenderer>(board);
 
     AbaloneGame game(board, std::move(renderer));
@@ -31,7 +31,7 @@ int main(void) {
     return 0;
 }
 
-AbaloneGame::AbaloneGame(const std::shared_ptr<AbaloneBoard> board, std::unique_ptr<Renderer> renderer): board(board), renderer(std::move(renderer)) {}
+AbaloneGame::AbaloneGame(const std::shared_ptr<Board> board, std::unique_ptr<Renderer> renderer): board(board), renderer(std::move(renderer)) {}
 
 void AbaloneGame::start(void) {
     Player winner;

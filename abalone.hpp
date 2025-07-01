@@ -18,14 +18,14 @@ namespace Abalone {
 
 class AbaloneGame {
 public:
-    AbaloneGame(const std::shared_ptr<AbaloneBoard> board, std::unique_ptr<Renderer> renderer);
+    AbaloneGame(const std::shared_ptr<Board> board, std::unique_ptr<Renderer> renderer);
 
     void start(void);
 
     Move readMove(void);
 
 private:
-    const std::shared_ptr<AbaloneBoard> board;
+    const std::shared_ptr<Board> board;
     std::unique_ptr<Renderer> renderer;
 };
 

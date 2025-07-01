@@ -25,17 +25,17 @@ Player Abalone::otherPlayer(const Player& player) {
     return Player::NONE;
 }
 
-constexpr int AbaloneBoard::STARTING_PIECES;
+constexpr int Board::STARTING_PIECES;
 
-int AbaloneBoard::hLookUp[9] = {
+int Board::hLookUp[9] = {
     0, 5, 11, 18, 26, 35, 43, 50, 56
 };
 
-int AbaloneBoard::dOffset[9] = {
+int Board::dOffset[9] = {
     0, 0, 0, 0, 0, -1, -2, -3, -4
 };
 
-AbaloneBoard::AbaloneBoard(GameOpening opening) {
+Board::Board(GameOpening opening) {
     // Initialise pieces depending on the chosen game opening.
     switch (opening) {
         case GameOpening::BELGIAN_DAISY:
@@ -51,18 +51,18 @@ AbaloneBoard::AbaloneBoard(GameOpening opening) {
                 0b1100011100001100000000000000000000000000000000011000011100011;
             break;
         default:
-            error("Tried to create an AbaloneBoard with an invalid opening");
+            error("Tried to create an Board with an invalid opening");
     }
 }
 
-// AbaloneBoard::AbaloneBoard(uint64_t whiteOpening, uint64_t blackOpening) {
+// Board::Board(uint64_t whiteOpening, uint64_t blackOpening) {
 //     // Verify that both openings have 14 marbles.
 
 // }
 
-AbaloneBoard::~AbaloneBoard() {}
+Board::~Board() {}
 
-bool AbaloneBoard::moveValid(const Move& move, const Player& player) {
+bool Board::moveValid(const Move& move, const Player& player) {
     if (move.type() == MoveType::BROADSIDE) {
         return broadsideMoveValid(std::get<BroadsideMove>(move.getMove()), player);
     } else {
@@ -70,7 +70,7 @@ bool AbaloneBoard::moveValid(const Move& move, const Player& player) {
     }
 }
 
-bool AbaloneBoard::move(const Move& move, const Player& player) {
+bool Board::move(const Move& move, const Player& player) {
     if (!moveValid(move, player)) {
         return false;
     }
@@ -84,16 +84,16 @@ bool AbaloneBoard::move(const Move& move, const Player& player) {
     return true;
 }
 
-Player AbaloneBoard::pieceAt(char horizontal, char diagonal) {
+Player Board::pieceAt(char horizontal, char diagonal) {
     // Validate numbers
     return this->pieceAt(Position(horizontal, diagonal));
 }
 
-Player AbaloneBoard::pieceAt(const Position& position) {
+Player Board::pieceAt(const Position& position) {
     return pieceAt(positionToIndex(position));
 }
 
-int AbaloneBoard::positionToIndex(const Position& position) {
+int Board::positionToIndex(const Position& position) {
     if (!position.isValid()) {
         return -1;
     }
@@ -103,7 +103,7 @@ int AbaloneBoard::positionToIndex(const Position& position) {
     return index;
 }
 
-Position AbaloneBoard::indexToPosition(const int index) {
+Position Board::indexToPosition(const int index) {
     if (index < 0 || index > 60) {
         return Position::invalid();
     }
@@ -118,12 +118,12 @@ Position AbaloneBoard::indexToPosition(const int index) {
     return Position('a' + static_cast<char>(hIndex), '1' - static_cast<char>(dOffset[hIndex] + index - hLookUp[index]));
 }
 
-Player AbaloneBoard::pieceAt(int index) {
+Player Board::pieceAt(int index) {
     return blackPieces & Utils::bit<uint64_t>(index) ? Player::BLACK : 
         (whitePieces & Utils::bit<uint64_t>(index) ? Player::WHITE : Player::NONE);
 }
 
-void AbaloneBoard::setPieceAt(const Position& position, const Player& player) {
+void Board::setPieceAt(const Position& position, const Player& player) {
     uint64_t mask = Utils::bit<uint64_t>(positionToIndex(position));
 
     if (player == Player::NONE) {
@@ -138,12 +138,12 @@ void AbaloneBoard::setPieceAt(const Position& position, const Player& player) {
     }
 }
 
-int AbaloneBoard::distance(const Position& start, const Position& end) {
+int Board::distance(const Position& start, const Position& end) {
     return std::max(std::abs(start.diagonalIndex - end.diagonalIndex), std::abs(start.horizontalIndex - end.horizontalIndex));
 }
 
 
-Player Abalone::AbaloneBoard::gameOver(void) {
+Player Abalone::Board::gameOver(void) {
     if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
         return Player::WHITE;
     } else if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
@@ -153,7 +153,7 @@ Player Abalone::AbaloneBoard::gameOver(void) {
     return Player::NONE;
 }
 
-bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player) {
+bool Board::inlineMoveValid(const InlineMove& move, const Player& player) {
     // Validate moves and player
     if (!move.end.isValid() || !move.start.isValid() || player == Player::NONE) {
         debug("inlineMoveValid(): A position was invalid or player == NONE");
@@ -228,7 +228,7 @@ bool AbaloneBoard::inlineMoveValid(const InlineMove& move, const Player& player)
     return true;
 }
 
-bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& player) {
+bool Board::broadsideMoveValid(const BroadsideMove& move, const Player& player) {
         // Validate moves and player
     if (!move.last.isValid() || !move.first.isValid() || !move.firstEnd.isValid() || player == Player::NONE) {
         debug("broadsideMoveValid(): A move position or player is invalid");
@@ -287,7 +287,7 @@ bool AbaloneBoard::broadsideMoveValid(const BroadsideMove& move, const Player& p
     return true;
 }
 
-void AbaloneBoard::inlineMove(const InlineMove& move, const Player& player) {
+void Board::inlineMove(const InlineMove& move, const Player& player) {
     (void) player;
 
     // Get the direction of the move
@@ -312,7 +312,7 @@ void AbaloneBoard::inlineMove(const InlineMove& move, const Player& player) {
     }
 }
 
-void AbaloneBoard::broadsideMove(const BroadsideMove& move, const Player& player) {
+void Board::broadsideMove(const BroadsideMove& move, const Player& player) {
     // Get the direction of the move
     int horizontalDir = move.firstEnd.horizontalIndex - move.first.horizontalIndex;
     int diagonalDir = move.firstEnd.diagonalIndex - move.first.diagonalIndex;

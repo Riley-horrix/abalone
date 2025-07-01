@@ -55,18 +55,18 @@ Player otherPlayer(const Player& player);
  * 5 bits, then B1-B6 in the next 6, etc.
  * 
  */
-class AbaloneBoard {
+class Board {
 public:
     /**
      * @brief Construct a new Abalone Board object with a standard opening.
      */
-    AbaloneBoard(GameOpening opening);
+    Board(GameOpening opening);
 
     // /**
     //  * @brief Construct a new Abalone Board object using a list of positions for 
     //  * the white and black pieces.
     //  */
-    // AbaloneBoard(const std::vector<Position>& whitePositions, const std::vector<Position>& blackPositions);
+    // Board(const std::vector<Position>& whitePositions, const std::vector<Position>& blackPositions);
 
     // /**
     //  * @brief Construct a new Abalone Board object using two bitfields.
@@ -74,12 +74,12 @@ public:
     //  * @param whiteOpening bitField containing the white pieces.
     //  * @param blackOpening bitField containing the black pieces.
     //  */
-    // AbaloneBoard(uint64_t whiteOpening, uint64_t blackOpening);
+    // Board(uint64_t whiteOpening, uint64_t blackOpening);
 
     /**
      * @brief Destroy the Abalone Board object.
      */
-    ~AbaloneBoard();
+    ~Board();
 
     /**
      * @brief Validate a move for a given player.

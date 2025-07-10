@@ -15,6 +15,10 @@
 #include <vector>
 #include <variant>
 
+#define ABALONE_API_VERSION_MAJOR 0
+#define ABALONE_API_VERSION_MINOR 1
+#define ABALONE_API_VERSION_PATCH 0
+
 namespace AbaloneInterface {
 
 enum GamePlayer {

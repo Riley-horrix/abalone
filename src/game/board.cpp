@@ -37,22 +37,11 @@ int Board::dOffset[9] = {
 
 Board::Board(GameOpening opening) {
     // Initialise pieces depending on the chosen game opening.
-    switch (opening) {
-        case GameOpening::BELGIAN_DAISY:
-            whitePieces = 
-                0b0000000001100001110000011000000000001100000111000011000000000;
-            blackPieces = 
-                0b0000011000011100000110000000000000000000110000011100001100000;
-            break;
-        case GameOpening::GERMAN_DAISY:
-            whitePieces = 
-                0b0001100011100001100000000000000000000000000011000011100011000;
-            blackPieces =
-                0b1100011100001100000000000000000000000000000000011000011100011;
-            break;
-        default:
-            error("Tried to create an Board with an invalid opening");
-    }
+    setupGameOpening(opening);
+
+    // Save the opening position
+    whiteOpening = whitePieces;
+    blackOpening = blackPieces;
 }
 
 // Board::Board(uint64_t whiteOpening, uint64_t blackOpening) {
@@ -143,7 +132,7 @@ int Board::distance(const Position& start, const Position& end) {
 }
 
 
-Player Abalone::Board::gameOver(void) {
+Player Board::gameOver(void) {
     if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
         return Player::WHITE;
     } else if (STARTING_PIECES - Utils::bitCount(whitePieces) >= 6) {
@@ -151,6 +140,37 @@ Player Abalone::Board::gameOver(void) {
     }
 
     return Player::NONE;
+}
+
+void Board::reset(void) {
+    whitePieces = whiteOpening;
+    blackPieces = blackOpening;
+}
+
+void Board::reset(GameOpening opening) {
+    setupGameOpening(opening);
+
+    whiteOpening = whitePieces;
+    blackOpening = blackPieces;
+}
+
+void Board::setupGameOpening(GameOpening opening) {
+    switch (opening) {
+        case GameOpening::BELGIAN_DAISY:
+            whitePieces = 
+                0b0000000001100001110000011000000000001100000111000011000000000;
+            blackPieces = 
+                0b0000011000011100000110000000000000000000110000011100001100000;
+            break;
+        case GameOpening::GERMAN_DAISY:
+            whitePieces = 
+                0b0001100011100001100000000000000000000000000011000011100011000;
+            blackPieces =
+                0b1100011100001100000000000000000000000000000000011000011100011;
+            break;
+        default:
+            error("Tried to create an Board with an invalid opening");
+    }
 }
 
 bool Board::inlineMoveValid(const InlineMove& move, const Player& player) {

@@ -134,6 +134,16 @@ public:
      */
     Player gameOver(void);
 
+    /**
+     * @brief Reset the board state.
+     */
+    void reset(void);
+
+    /**
+     * @brief Reset the board state with a specific opening.
+     */
+    void reset(GameOpening opening);
+
 private:
     //! @brief Bit field containing the positions of the white pieces.
     uint64_t whitePieces = 0;
@@ -148,6 +158,11 @@ private:
 
     //! @brief Diagonal offset lookup for horizontal positions.
     static int dOffset[9];
+
+    uint64_t whiteOpening = 0;
+    uint64_t blackOpening = 0;
+
+    void setupGameOpening(GameOpening opening);
 
     /**
      * @brief Translate a board position to an index as described in the board description.

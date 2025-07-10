@@ -3,20 +3,15 @@ DEBUG?=""
 all: build/game
 
 game: build/game
-	@ if [ "$(DEBUG)" !=  "" ]; then \
-		./build/abalone_game_debug; \
-	else \
-		./build/abalone_game; \
-	fi
+	./build/abalone_game;
+
+interface: build/interface
 
 clean:
 	@rm -rf build/*
 
 build/game: build/common
 	cd build && cmake --build . --target abalone_game
-	@ if [ "$(DEBUG)" !=  "" ]; then \
-		mv build/abalone_game build/abalone_game_debug ; \
-	fi
 
 build/common:
 	mkdir -p ./build
@@ -26,4 +21,11 @@ build/common:
 		cd build && cmake -DCMAKE_BUILD_TYPE=Release ..; \
 	fi
 
-.PHONY: all clean game build/common build/game
+build/interface: build/common include/client/abaloneInterface.hpp
+	mkdir -p build/interface
+	@mv include/client/abaloneInterface.hpp build/interface/
+
+
+
+
+.PHONY: all clean game build/common build/game build/interface

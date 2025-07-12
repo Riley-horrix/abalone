@@ -13,8 +13,6 @@
 #include <ctime>
 #include <csignal>
 
-#include "common/utils.hpp"
-
 #define error(fmt, ...) (fprintf(stderr, "\033[31m[ERROR]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ ), fflush(stderr), raise(SIGTERM))
 #define warn(fmt, ...) fprintf(stdout, "\033[93m[WARN]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ )
 #define info(fmt, ...) fprintf(stdout, "\033[32m[info]\033[0m " fmt ".\n" __VA_OPT__(,) __VA_ARGS__ )

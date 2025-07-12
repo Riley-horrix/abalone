@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include "common/logging.hpp"
+#include "common/utils.hpp"
 #include "game/board.hpp"
 
 using namespace Abalone;

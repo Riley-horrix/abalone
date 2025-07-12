@@ -11,7 +11,13 @@
 
 #include <cstdint>
 
+#include "common/logging.hpp"
+
+#include "lib/json.hpp"
+
 namespace Abalone {
+
+#define STR(x) #x
 
 /**
  * @brief Utility function object.
@@ -52,6 +58,28 @@ public:
 
     template<class T>
     static inline int sign(T val) { return val > 0 ? 1 : val < 0 ? -1 : 0; }
+
+    /**
+     * @brief Helper function to extract a field from a json object.
+     * 
+     * @tparam T The type of the field.
+     * @param json The json object.
+     * @param key The string key.
+     * @param defaultValue A default value.
+     * @return T The found object or the default value;
+     */
+    template<typename T>
+    static T getOrDefault(const nlohmann::json& json, const std::string& key, const T& defaultValue) {
+        if (json.contains(key) && json[key].is_null() == false) {
+            try {
+                return json[key].get<T>();
+            } catch (const nlohmann::json::exception& e) {
+                info("APIMessage: Failed to parse %s, \"%s\"", key.c_str(), e.what());
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
 };
 
 }

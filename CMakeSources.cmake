@@ -8,6 +8,9 @@ set(SRC_FILES
     ./src/common/utils.cpp
     ./src/common/logging.cpp
 
+    # Connect
+    ./src/connect/messages.cpp
+
     # Graphics
     ./src/graphics/renderer.cpp
     ./src/graphics/textRenderer.cpp

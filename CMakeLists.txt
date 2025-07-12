@@ -18,5 +18,6 @@ add_compile_options(${WARNINGS})
 include(CMakeSources.cmake)
 
 include_directories(include)
+include_directories(lib/include)
 
 add_executable(abalone_game ${SRC_FILES} abalone.cpp)

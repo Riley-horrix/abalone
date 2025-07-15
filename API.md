@@ -129,7 +129,9 @@ Used to indicate that the game with the following player was cancelled. This may
 ### Request Move (8)
 
 ```py
-"content": {}
+"content": {
+    "game_state": game_state_t
+}
 ```
 
 Used to request a move from a client.
@@ -208,12 +210,11 @@ Indicates that the move contained in the `"message"` field was rejected and not 
 ### Game Finished (15)
 ```py
 "content": {
-    "won": bool,
-    "winner": str
+    "won": bool
 }
 ```
 
-Indicates that the game has concluded, and whether the client has won or not, along with the name of the winner.
+Indicates that the game has concluded, and whether the client has won or not.
 
 - Sent by server to the client.
 

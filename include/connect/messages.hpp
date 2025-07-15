@@ -87,13 +87,13 @@ struct APIPlayerPosition {
 };
 
 
-struct APIGameState {
+struct GameState {
     /**
-     * @brief Construct a new APIGameState object.
+     * @brief Construct a new GameState object.
      * 
      * @param positions List of game options.
      */
-    APIGameState(std::vector<APIPlayerPosition> positions);
+    GameState(std::vector<APIPlayerPosition> positions);
 
     /// @brief List of game positions.
     std::vector<APIPlayerPosition> positions;
@@ -320,7 +320,7 @@ public:
      * 
      * @param name The name of the other player.
      */
-    APIJoinGame(std::string otherPlayer);
+    APIJoinGame(const std::string& otherPlayer);
 
     /**
      * @brief Convert the message to a JSON formatted string.
@@ -362,8 +362,6 @@ public:
 
     /**
      * @brief Construct a new APIAcceptGame object.
-     * 
-     * @param name The name of the other player.
      */
     APIAcceptGame();
 
@@ -399,14 +397,14 @@ public:
 class APIGameStart : public APIMessage {
 public:
     /// @brief Message identifier.
-    static const int ID = 5;
+    static const int ID = 6;
 
     /**
      * @brief Construct a new APIGameStart object.
      * 
-     * @param name The name of the other player.
+     * @param state The starting game state.
      */
-    APIGameStart(APIGameState state);
+    APIGameStart(const GameState& state);
 
     /**
      * @brief Convert the message to a JSON formatted string.
@@ -416,7 +414,7 @@ public:
     std::string toString(void) override;
 
     /// @brief The current game state.
-    APIGameState state;
+    GameState state;
 
     /**
      * @brief Create the message from a JSON object.
@@ -436,4 +434,492 @@ public:
     void toJSON(nlohmann::json& json) override;
 };
 
+
+/**
+ * @brief Message sent by server to client to represent a game starting.
+ */
+class APIGameCancelled : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 7;
+
+    /**
+     * @brief Construct a new APIGameCancelled object.
+     * 
+     * @param reason The string reason for cancelling the game.
+     * @param id The integer id for the reason.
+     */
+    APIGameCancelled(const std::string& reason, int id);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The reason for cancelling the game.
+    std::string reason;
+
+    /// @brief The reason identifier.
+    int id;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by server to client to ask the client to make a move.
+ */
+class APIRequestMove : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 8;
+
+    /**
+     * @brief Construct a new APIRequestMove object.
+     */
+    APIRequestMove(const GameState& state);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The current game state.
+    GameState state;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIRequestGameState : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 8;
+
+    /**
+     * @brief Construct a new APIRequestGameState object.
+     */
+    APIRequestGameState();
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIRequestGameState : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 9;
+
+    /**
+     * @brief Construct a new APIRequestGameState object.
+     */
+    APIRequestGameState();
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIGameState : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 10;
+
+    /**
+     * @brief Construct a new APIGameState object.
+     */
+    APIGameState(const GameState& state);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The current game state.
+    GameState state;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIInlineMove : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 11;
+
+    /**
+     * @brief Construct a new APIInlineMove object.
+     * 
+     * @param last The position of the last piece in the inline move.
+     * @param move The moved position of the last piece in the move.
+     */
+    APIInlineMove(const APIPlayerPosition& last, const APIPlayerPosition move);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The position of the last piece in the inline move.
+    APIPlayerPosition last;
+    
+    /// @brief The position of the last piece when moved.
+    APIPlayerPosition move;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIBroadsideMove : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 12;
+
+    /**
+     * @brief Construct a new APIBroadsideMove object.
+     * 
+     * @param first The position of the first piece in the broadside move.
+     * @param last The position of the last piece in the broadside move.
+     * @param firstMove The moved position of the first piece in the broadside move.
+     */
+    APIBroadsideMove(const APIPlayerPosition& first, const APIPlayerPosition& last, const APIPlayerPosition& firstMove);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The position of the first piece in the broadside move.
+    APIPlayerPosition first;
+    
+    /// @brief The position of the last piece in the broadside move.
+    APIPlayerPosition last;
+
+    /// @brief The moved position of the first piece in the broadside move.
+    APIPlayerPosition firstMove;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIMoveAccepted : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 13;
+
+    /**
+     * @brief Construct a new APIMoveAccepted object.
+     * 
+     * @param msg The position of the first piece in the broadside move.
+     */
+    APIMoveAccepted(std::unique_ptr<APIMessage> msg);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The move that got accepted.
+    std::unique_ptr<APIMessage> msg;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIMoveRejected : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 14;
+
+    /**
+     * @brief Construct a new APIMoveRejected object.
+     * 
+     * @param msg The position of the first piece in the broadside move.
+     */
+    APIMoveRejected(std::unique_ptr<APIMessage> msg, const std::string& reason, int id);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief The move that got accepted.
+    std::unique_ptr<APIMessage> msg;
+
+    /// @brief The reason for rejecting the move.
+    std::string reason;
+
+    /// @brief The integer id for the reason.
+    int id;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIGameFinished : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 15;
+
+    /**
+     * @brief Construct a new APIGameFinished object.
+     * 
+     * @param msg The position of the first piece in the broadside move.
+     */
+    APIGameFinished(bool won);
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /// @brief Whether the player won the game or not.
+    bool won;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
+
+
+/**
+ * @brief Message sent by client to server to request the game state.
+ */
+class APIConcede : public APIMessage {
+public:
+    /// @brief Message identifier.
+    static const int ID = 16;
+
+    /**
+     * @brief Construct a new APIConcede object.
+     * 
+     * @param msg The position of the first piece in the broadside move.
+     */
+    APIConcede();
+
+    /**
+     * @brief Convert the message to a JSON formatted string.
+     * 
+     * @return std::string The JSON formatted string.
+     */
+    std::string toString(void) override;
+
+    /**
+     * @brief Create the message from a JSON object.
+     * 
+     * Assumes that the "id" field is set and correct.
+     * 
+     * @param json The JSON object to read from.
+     * @return std::unique_ptr<APIMessage> The message, or nullptr if invalid.
+     */
+    static std::unique_ptr<APIMessage> fromJSON(const nlohmann::json& json);
+
+    /**
+     * @brief Convert the message to JSON.
+     * 
+     * @param json The JSON object to write values into.
+     */
+    void toJSON(nlohmann::json& json) override;
+};
 }

@@ -8,18 +8,20 @@ This document records the text based API communication between the Abalone game 
 
 Every message should be formatted like so,
 
-```json
+```py
 {
-    "id": number,
+    "id": int,
     "content": {}
 }
 ```
+
+In internal documentation this is represented as `game_message_t`.
 
 The following sections will define the `id` field of the message, alongside the layout of the content block, in the format,
 
 ### NAME (id)
 
-```json 
+```py
 "content": {}
 ```
 
@@ -33,11 +35,11 @@ The following messages are used in the initial connection protocol.
 
 ### Connect (1)
 
-```json
+```py
 "content": {
     "version": "0.1.0",
     "magic": "ABALONE",
-    "name" : string
+    "name" : str
 }
 ```
 
@@ -47,9 +49,10 @@ Used to connect to a running abalone game instance.
 
 ### Acknowledge (2)
 
-```json
+```py
 "content": {
-    "name": string
+    "version": "0.1.0",
+    "name": str
 }
 ```
 
@@ -63,7 +66,7 @@ The following commands are sent or received anytime after the acknowledgement me
 
 ### Request Game (3)
 
-```json
+```py
 "content": {
     "desired_side": "black" | "white" | "none" | "random",
     "desired_start": "belgian" | "german" | "none" | "random"
@@ -78,24 +81,20 @@ For both of the desired options, if both players agree, then both players will g
 
 ### Join Game (4)
 
-```json
+```py
 "content": {
-    "side": "black" | "white" | "random",
-    "start": "belgian" | "german" | "none",
-    "other_player": string
+    "other_player": str
 }
 ```
 
-Request from the server for the player to join a game, specifies the other player's name and the chosen start and start format for the game.
+Request from the server for the player to join a game, specifies the other player's name.
 
 - Sent by server to the client.
 
 ### Accept Game (5)
 
-```json
-"content": {
-    "other_player": string
-}
+```py
+"content": {}
 ```
 
 Accept a game with the other player.
@@ -104,7 +103,7 @@ Accept a game with the other player.
 
 ### Game Start (6)
 
-```json
+```py
 "content": {
     "game_state": game_state_t
 }
@@ -116,10 +115,10 @@ Message from the server to indicate that the game has started.
 
 ### Game Cancelled (7)
 
-```json
+```py
 "content": {
-    "reason": string,
-    "id": number
+    "reason": str,
+    "id": int
 }
 ```
 
@@ -129,7 +128,7 @@ Used to indicate that the game with the following player was cancelled. This may
 
 ### Request Move (8)
 
-```json
+```py
 "content": {}
 ```
 
@@ -138,7 +137,7 @@ Used to request a move from a client.
 - Sent from server to the client.
 
 ### Request Game State (9)
-```json
+```py
 "content": {}
 ```
 
@@ -147,7 +146,7 @@ Request the current game state from the server.
 - Sent from client to the server.
 
 ### Game State (10)
-```json
+```py
 "content": {
     "game_state": game_state_t
 }
@@ -158,7 +157,7 @@ The current game state.
 - Sent by the server to the client.
 
 ### Inline Move (11)
-```json
+```py
 "content": {
     "last": game_position_t,
     "move": game_position_t
@@ -170,7 +169,7 @@ Execute an inline move. The `"last"` field indicates the last piece in the inlin
 - Sent by the client to the server.
 
 ### Broadside Move (12)
-```json
+```py
 "content": {
     "first": game_position_t,
     "last": game_position_t,
@@ -183,7 +182,7 @@ Execute a broadside move. The `"first"` and `"last"` fields indicate the first a
 - Sent by the client to the server.
 
 ### Move Accepted (13)
-```json
+```py
 "content": {
     "message": game_message_t
 }
@@ -194,11 +193,11 @@ Indicates that the move contained in the `"message"` field was accepted and play
 - Sent by server to the client.
 
 ### Move Rejected (14)
-```json
+```py
 "content": {
     "message": game_message_t,
-    "reason": string,
-    "id": number
+    "reason": str,
+    "id": int
 }
 ```
 
@@ -207,10 +206,10 @@ Indicates that the move contained in the `"message"` field was rejected and not 
 - Sent by server to the client.
 
 ### Game Finished (15)
-```json
+```py
 "content": {
     "won": bool,
-    "winner": string
+    "winner": str
 }
 ```
 
@@ -219,7 +218,7 @@ Indicates that the game has concluded, and whether the client has won or not, al
 - Sent by server to the client.
 
 ### Concede (16)
-```json
+```py
 "content": {}
 ```
 
@@ -239,12 +238,12 @@ Concede the current game and allow the enemy to win.
 This section defines the various types used in the API.
 
 ### game_state_t
-```json
+```py
 game_state_t: [game_pieces_t]
 ```
 
 ### game_pieces_t
-```json
+```py
 game_pieces_t: {
     "pos": game_position_t,
     "piece": "w" | "b"
@@ -252,7 +251,7 @@ game_pieces_t: {
 ```
 
 ### game_position_t
-```json
+```py
 game_position_t: "[A-I]" + "[1-9]"
 ```
 

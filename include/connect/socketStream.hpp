@@ -21,12 +21,12 @@ public:
     /**
      * @brief Construct a new Socket Stream object from its file descriptor.
      */
-    explicit SocketStream(const int fd) noexcept;
+    explicit SocketStream(const int fd);
 
     /**
      * @brief Move constructor.
      */
-    SocketStream(SocketStream&& other) noexcept;
+    SocketStream(SocketStream&& other);
 
     /**
      * @brief Move assignment constructor.
@@ -60,21 +60,23 @@ public:
      * @param n Number of elements to write.
      * @return std::size_t Number of elements written.
      */
-    std::size_t write(char* buffer, std::size_t n) override;
+    std::size_t write(const char* buffer, std::size_t n) override;
 
     /**
-     * @brief Get an input stream to read from.
+     * @brief Overloaded write into operator.
      * 
-     * @return std::basic_istream<char>& The input stream.
+     * @param c The character to write.
+     * @return SocketStream& This.
      */
-    input_stream& getRead(void) override;
-    
+    SocketStream& operator<<(const char& c) override;
+
     /**
-     * @brief Get an output stream to write to.
+     * @brief Overloaded read from operator.
      * 
-     * @return std::basic_ostream<char>& The output stream.
+     * @param c The message to read into.
+     * @return SocketStream& This.
      */
-    output_stream& getWrite(void) override;
+    SocketStream& operator>>(char& c) override;
 
 private:
     /**

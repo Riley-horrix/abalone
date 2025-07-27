@@ -30,12 +30,10 @@ public:
     /**
      * @brief Move constructor.
      */
-    TCPServer(TCPServer&& other) noexcept;
+    TCPServer(TCPServer&& other);
 
-    /**
-     * @brief Move assignment constructor.
-     */
-    TCPServer& operator=(TCPServer&& other);
+    /// @brief Deleted move assignment
+    TCPServer& operator=(TCPServer&& other) = delete;
 
     /// @brief Deleted copy constructor.
     TCPServer(const TCPServer&) = delete;
@@ -44,11 +42,9 @@ public:
     TCPServer& operator=(const TCPServer&) = delete;
 
     /**
-     * @brief Start the TCP server.
-     * 
-     * @return int Error code, returns 0 on success.
+     * @brief Destroy the TCPServer object.
      */
-    int start(void);
+    ~TCPServer();
 
     /**
      * @brief Accept a new connection on the TCP server.
@@ -57,12 +53,22 @@ public:
      * @return SocketStream A socket stream to read / write to client. Returns nullptr if an error occurs.
      */
     std::shared_ptr<SocketStream> accept(bool block = true);
+
 private:
     /// @brief The string ip address for the server.
     const std::string ipAddr;
 
     /// @brief The port number for the server.
     const uint16_t port;
+
+    /// @brief The server connection backlog.
+    const int backlog;
+
+    /// @brief The server socket file descriptor.
+    int serverFd;
+
+    /// @brief Whether the accept call is blocking or not.
+    bool blockingAccept = false;
 
     /// @brief The currently open sockets.
     std::vector<std::shared_ptr<SocketStream>> openSockets;

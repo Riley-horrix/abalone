@@ -18,6 +18,9 @@
 #define info(fmt, ...) fprintf(stdout, "\033[32m[info]\033[0m " fmt ".\n" __VA_OPT__(,) __VA_ARGS__ )
 #define prompt(fmt, ...) fprintf(stdout, "\033[96m" fmt "\033[0m" __VA_OPT__(,) __VA_ARGS__)
 
+#define stl_error(code, fmt, ...) error(fmt ", cause %d: %s" __VA_OPT__(,) __VA_ARGS__, code, strerror(code))
+#define stl_warn(code, fmt, ...) warn(fmt ", cause %d: %s" __VA_OPT__(,) __VA_ARGS__, code, strerror(code))
+
 #ifdef DEBUG
 #define debug(fmt, ...) fprintf(stdout, "\033[95m[debug]\033[0m " fmt "!\n" __VA_OPT__(,) __VA_ARGS__ )
 #else

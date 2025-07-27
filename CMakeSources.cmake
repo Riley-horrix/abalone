@@ -10,6 +10,9 @@ set(SRC_FILES
 
     # Connect
     ./src/connect/messages.cpp
+    ./src/connect/apiMessageStream.cpp
+    ./src/connect/tcpServer.cpp
+    ./src/connect/socketStream.cpp
 
     # Graphics
     ./src/graphics/renderer.cpp

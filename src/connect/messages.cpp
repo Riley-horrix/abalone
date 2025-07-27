@@ -12,6 +12,7 @@
 #include <format>
 
 #include "connect/messages.hpp"
+
 #include "common/utils.hpp"
 
 #include "lib/json.hpp"
@@ -57,18 +58,22 @@ std::string APIMessage::toString() {
 
 std::unique_ptr<APIMessage> APIMessage::fromString(const std::string& message) {
     nlohmann::json j;
-
     const auto json = j.parse(message);
+    return fromJSON(json);
+}
+
+// TODO
+std::unique_ptr<APIMessage> APIMessage::fromJSON(const nlohmann::json& json) {
     const int id = Utils::getOrDefault(json, "id", -1);
 
-    if (id <= 0) { return nullptr; }
-
-    switch (id) {
-        case APIConnect::ID:
-            return APIConnect::fromJSON(json);
+    if (id == -1) {
+        return nullptr;
     }
 
-    return nullptr;
+    switch (id) {
+        default:
+            return nullptr;
+    }
 }
 
 nlohmann::json APIMessage::formatGameState(const GameState& state) {
@@ -127,7 +132,7 @@ bool APIMessage::gamePositionFromJson(const nlohmann::json& json, APIPlayerPosit
     }
 
     if (gamePiece.size() != 1) {
-        return;
+        return false;
     }
 
     Position pos = Position(gamePosition[0], gamePosition[1]);
@@ -409,8 +414,8 @@ std::unique_ptr<APIMessage> APIInlineMove::fromJSON(const nlohmann::json& j) {
 void APIInlineMove::toJSON(nlohmann::json& json) const {
     json["id"] = APIInlineMove::ID;
     json["content"] = {
-        {"last", APIMessage::formatGamePosition(last)},
-        {"move", APIMessage::formatGamePosition(move)}
+        {"last", std::format("{}{}", last.horizontal, last.diagonal)},
+        {"move", std::format("{}{}", move.horizontal, move.diagonal)}
     };
 }
 
@@ -454,9 +459,9 @@ std::unique_ptr<APIMessage> APIBroadsideMove::fromJSON(const nlohmann::json& j) 
 void APIBroadsideMove::toJSON(nlohmann::json& json) const {
     json["id"] = APIBroadsideMove::ID;
     json["content"] = {
-        {"first", APIMessage::formatGamePosition(first)},
-        {"last", APIMessage::formatGamePosition(last)},
-        {"first_move", APIMessage::formatGamePosition(firstMove)}
+        {"first", std::format("{}{}", first.horizontal, first.diagonal)},
+        {"last", std::format("{}{}", last.horizontal, last.diagonal)},
+        {"first_move", std::format("{}{}", firstMove.horizontal, firstMove.diagonal)}
     };
 }
 

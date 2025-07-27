@@ -7,8 +7,7 @@
  * 
  * Copyright (c) Riley Horrix 2025
  */
-#ifndef ABALONE_BYTESTREAM_H
-#define ABALONE_BYTESTREAM_H
+#pragma once
 
 #include <cstddef>
 #include <ostream>
@@ -21,9 +20,8 @@ namespace Abalone {
 template<class T>
 class Stream {
 public:
-    using input_stream = std::basic_istream<T>;
-    using output_stream = std::basic_ostream<T>;
-
+    virtual ~Stream() {}
+    
     /**
      * @brief Read n elements of T into the buffer.
      * 
@@ -40,23 +38,23 @@ public:
      * @param n Number of elements to write.
      * @return std::size_t Number of elements written.
      */
-    virtual std::size_t write(T* buffer, std::size_t n) = 0;
+    virtual std::size_t write(const T* buffer, std::size_t n) = 0;
 
     /**
-     * @brief Get an input stream to read from.
+     * @brief Overloaded write into operator.
      * 
-     * @return std::basic_istream<T>& The input stream.
+     * @param msg The message to write.
+     * @return Stream& This.
      */
-    virtual input_stream& getRead(void) = 0;
-    
+    virtual Stream& operator<<(const T& msg) = 0;
+
     /**
-     * @brief Get an output stream to write to.
+     * @brief Overloaded read from operator.
      * 
-     * @return std::basic_ostream<T>& The output stream.
+     * @param msg The message to read into.
+     * @return Stream& This.
      */
-    virtual output_stream& getWrite(void) = 0;
+    virtual Stream& operator>>(T& msg) = 0;
 };
 
 }
-
-#endif

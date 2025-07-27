@@ -589,14 +589,14 @@ public:
      * @param last The position of the last piece in the inline move.
      * @param move The moved position of the last piece in the move.
      */
-    APIInlineMove(const APIPlayerPosition& last, const APIPlayerPosition move): APIMessage(APIInlineMove::ID),
+    APIInlineMove(const Position& last, const Position move): APIMessage(APIInlineMove::ID),
         last(last), move(move) {}
 
     /// @brief The position of the last piece in the inline move.
-    APIPlayerPosition last;
+    Position last;
     
     /// @brief The position of the last piece when moved.
-    APIPlayerPosition move;
+    Position move;
 
     /**
      * @brief Create the message from a JSON object.
@@ -632,17 +632,17 @@ public:
      * @param last The position of the last piece in the broadside move.
      * @param firstMove The moved position of the first piece in the broadside move.
      */
-    APIBroadsideMove(const APIPlayerPosition& first, const APIPlayerPosition& last, const APIPlayerPosition& firstMove): APIMessage(APIBroadsideMove::ID),
+    APIBroadsideMove(const Position& first, const Position& last, const Position& firstMove): APIMessage(APIBroadsideMove::ID),
         first(first), last(last), firstMove(firstMove) {}
 
     /// @brief The position of the first piece in the broadside move.
-    APIPlayerPosition first;
+    Position first;
     
     /// @brief The position of the last piece in the broadside move.
-    APIPlayerPosition last;
+    Position last;
 
     /// @brief The moved position of the first piece in the broadside move.
-    APIPlayerPosition firstMove;
+    Position firstMove;
 
     /**
      * @brief Create the message from a JSON object.
